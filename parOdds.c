@@ -3,16 +3,23 @@
 #include <stdio.h>
 #include "parOdds.h"
 #include "rtclock.h"
+
+/**
+ * Global (shared) variables
+ */
 const long N = 100000000;
 int *array; // points to the array of ints on the heap
 int *results; 
 
+/**
+ * Worker threads do this function
+ */
 void* worker(void *param) {
-    int *whoAmI = (int*) param; // either thread 0 or 1
+    int *whoAmI = param; // either thread 0 or 1
 
     int begin = (*whoAmI % 2 == 0) ? 0 : N/2;
     int end =   (*whoAmI % 2 == 0) ? N/2 : N;
-    //printf("thread %d start at [%d] and end at [%d]\n", *whoAmI, begin, end);
+    printf("thread %d start at [%d] and end at [%d]\n", *whoAmI, begin, end-1);
 
     int count = 0;
     for (int i = begin; i < end; i++) {
@@ -21,7 +28,6 @@ void* worker(void *param) {
         }
     }
     results[*whoAmI] = count;
-    free(param);
     return NULL;
 }
 
@@ -40,18 +46,18 @@ int main(int argc, char *argv[]) {
     // malloc an array for threads to deposit their results
     results = (int*) malloc(sizeof(int) * 2);
 
-    // spin up the two worker threads!
-    pthread_t tid[2];
+    // spawn 2 worker threads
+    pthread_t myThreads[2];
+    int tid[2];
     for (int i = 0; i < 2; i++) {
-        int *threadID = (int*) malloc(sizeof(int));
-        *threadID = i;
-        pthread_create(&tid[i], NULL, worker, threadID);
+        tid[i] = i;
+       pthread_create(&myThreads[i], NULL, worker, &tid[i]);
     }
 
     // wait for all the threads to finish
     int sum = 0;
     for (int i = 0; i < 2; i++) {
-        pthread_join(tid[i], NULL);
+        pthread_join(myThreads[i], NULL);
         sum += results[i];
     }
     printf("Total count: %d\n", sum);
