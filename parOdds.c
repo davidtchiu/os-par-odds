@@ -36,7 +36,7 @@ void* worker(void *param) {
  */
 int main(int argc, char *argv[]) {
     srand(0);    // "seed" the random number generator
-    array = (int*) malloc(sizeof(int)*N);
+    array = malloc(sizeof(int)*N);
     for (int i = 0; i < N; i++) {
         array[i] = rand();
     }
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     pthread_t myThreads[2];
     int tid[2];
     for (int i = 0; i < 2; i++) {
-        tid[i] = i;
+       tid[i] = i;
        pthread_create(&myThreads[i], NULL, worker, &tid[i]);
     }
 

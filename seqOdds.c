@@ -11,7 +11,7 @@ int *array; // points to the array of ints on the heap
 int main() {
 
   srand(0);    // "seed" the random number generator
-  array = (int*) malloc(sizeof(int)*N);
+  array = malloc(sizeof(int)*N);
   for (int i = 0; i < N; i++) {
       array[i] = rand();
   }
